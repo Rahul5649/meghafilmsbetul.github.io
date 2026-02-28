@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Megha Films</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#000000',
+                            dark: '#0a0a0a',
+                            gold: '#D4AF37',
+                            gray: '#8a8a8a',
+                            border: '#333333'
+                        }
+                    },
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .luxury-text {
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .thin-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input,
+        select,
+        textarea {
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        input:focus {
+            border-color: #D4AF37;
+            outline: none;
+        }
+
+        .btn-gold {
+            background: #D4AF37;
+            color: #000;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gold:hover {
+            background: #f1c40f;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div class="bg-brand-dark p-8 rounded-lg thin-border w-full max-w-md shadow-2xl">
+            <h2 class="luxury-text text-2xl text-center mb-8">Admin Access</h2>
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-xs uppercase tracking-widest text-brand-gray mb-2">Access Key</label>
+                    <input type="password" id="admin-pass" placeholder="Enter Password">
+                </div>
+                <button onclick="handleLogin()" class="btn-gold w-full uppercase tracking-widest">Login</button>
+                <p id="login-error" class="text-red-500 text-xs text-center hidden">Invalid credentials</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden by default) -->
+    <div id="dashboard" class="hidden">
+        <nav class="border-b thin-border p-6 bg-brand-dark flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-camera-retro text-brand-gold text-xl"></i>
+                <span class="luxury-text text-sm">Megha Films Admin</span>
+            </div>
+            <button onclick="logout()"
+                class="text-brand-gray text-xs uppercase tracking-widest hover:text-white transition">Logout</button>
+        </nav>
+
+        <div class="max-w-6xl mx-auto p-6 lg:p-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+                <!-- Add Media Form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-brand-dark p-6 rounded-lg thin-border sticky top-24">
+                        <h3 class="luxury-text text-sm mb-6 pb-2 border-b thin-border">Add to Portfolio</h3>
+                        <form id="media-form" onsubmit="addMedia(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest text-brand-gray mb-2">Source
+                                    Type</label>
+                                <select id="media-type" onchange="toggleInputs()">
+                                    <option value="youtube">YouTube Video</option>
+                                    <option value="instagram">Instagram Reel/Post</option>
+                                    <option value="drive">Google Drive Link</option>
+                                    <option value="direct">Direct Image URL</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest text-brand-gray mb-2">Media
+                                    URL</label>
+                                <input type="text" id="media-url" placeholder="Paste link here..." required>
+                                <p class="text-[9px] text-brand-gray mt-2" id="url-hint">Provide full YouTube watch link
+                                </p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase tracking-widest text-brand-gray mb-2">Category</label>
+                                <select id="media-category">
+                                    <option value="Traditional">Traditional Wedding</option>
+                                    <option value="Cinematic">Cinematic Film</option>
+                                    <option value="Candid">Candid Photography</option>
+                                    <option value="PreWedding">Pre-Wedding</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-gold w-full mt-4 text-xs">UPLOAD MEDIA</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Media List -->
+                <div class="lg:col-span-2">
+                    <h3 class="luxury-text text-sm mb-6 flex justify-between items-center">
+                        <span>Current Portfolio</span>
+                        <span id="media-count" class="text-[10px] text-brand-gray">0 Items</span>
+                    </h3>
+                    <div id="media-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        // Using common injection logic if exists, otherwise fallback
+        const firebaseConfig = {
+            apiKey: "AIzaSy...", // To be replaced or injected
+            authDomain: "megha-films-betul.firebaseapp.com",
+            projectId: "megha-films-betul",
+            storageBucket: "megha-films-betul.appspot.com",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+
+        // Try to get injected config
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                Object.assign(firebaseConfig, JSON.parse(__firebase_config));
+            }
+        } catch (e) { }
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'megha-films-betul';
+
+        // --- AUTH LOGIC ---
+        function handleLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'megha123') { // Simple pass check to reveal dashboard
+                localStorage.setItem('admin_auth', 'true');
+                showDashboard();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            loadMedia();
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_auth');
+            location.reload();
+        }
+
+        if (localStorage.getItem('admin_auth') === 'true') {
+            showDashboard();
+        }
+
+        // --- MEDIA LOGIC ---
+        function toggleInputs() {
+            const type = document.getElementById('media-type').value;
+            const hint = document.getElementById('url-hint');
+            if (type === 'youtube') hint.innerText = "Example: https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+            else if (type === 'instagram') hint.innerText = "Example: https://www.instagram.com/reel/C2X4...";
+            else hint.innerText = "Provide direct path to the file/image.";
+        }
+
+        async function addMedia(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
+
+            const type = document.getElementById('media-type').value;
+            const url = document.getElementById('media-url').value;
+            const category = document.getElementById('media-category').value;
+
+            let thumbnail = '';
+            let mediaId = '';
+
+            try {
+                if (type === 'youtube') {
+                    const vid = url.split('v=')[1]?.split('&')[0];
+                    if (!vid) throw new Error("Invalid YouTube URL");
+                    mediaId = vid;
+                    thumbnail = `https://img.youtube.com/vi/${vid}/mqdefault.jpg`;
+                } else if (type === 'instagram') {
+                    // Instagram logic - simplified
+                    mediaId = url.split('/')[4];
+                    thumbnail = 'https://icon-library.com/images/instagram-icon-png-white/instagram-icon-png-white-15.jpg';
+                } else {
+                    thumbnail = url;
+                    mediaId = Date.now().toString();
+                }
+
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('gallery').add({
+                    type, url, category, thumbnail, mediaId, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                e.target.reset();
+                loadMedia();
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                btn.innerText = "UPLOAD MEDIA";
+                btn.disabled = false;
+            }
+        }
+
+        function loadMedia() {
+            db.collection('artifacts').doc(appId).collection('public').doc('data').collection('gallery')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    const list = document.getElementById('media-list');
+                    document.getElementById('media-count').innerText = `${snapshot.size} Items`;
+                    list.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const item = `
+                            <div class="bg-brand-dark p-4 rounded border thin-border relative group">
+                                <img src="${data.thumbnail}" class="w-full h-32 object-cover opacity-60 rounded mb-3">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[10px] text-brand-gold uppercase tracking-widest">${data.category}</p>
+                                        <p class="text-[9px] text-brand-gray mt-1 truncate max-w-[150px]">${data.type.toUpperCase()}</p>
+                                    </div>
+                                    <button onclick="deleteMedia('${doc.id}')" class="text-red-500 hover:text-red-400 p-2">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        list.innerHTML += item;
+                    });
+                });
+        }
+
+        async function deleteMedia(id) {
+            if (confirm("Are you sure?")) {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('gallery').doc(id).delete();
+            }
+        }
+    </script>
+</body>
+
+</html>

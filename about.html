@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Megha Films Pvt Ltd</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#000000',
+                            dark: '#0a0a0a',
+                            light: '#ffffff',
+                            gold: '#D4AF37',
+                            gray: '#8a8a8a',
+                            border: '#333333'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        widest: '.25em',
+                        luxury: '.3em'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .luxury-text {
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .thin-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-gold {
+            border: 1px solid #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #D4AF37;
+            padding: 12px 30px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+        }
+
+        .btn-gold:hover {
+            background: #D4AF37;
+            color: #000;
+        }
+
+        .page-header {
+            height: 60vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('https://images.unsplash.com/photo-1595964270729-3877dc65f4de?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80') center/cover no-repeat fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vertical-divider {
+            width: 1px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 20px auto;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Side Drawer */
+        #side-drawer {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        #side-drawer.active {
+            transform: translateX(0);
+        }
+
+        #drawer-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-link {
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .side-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: #D4AF37;
+            transition: width 0.3s ease;
+        }
+
+        .side-link:hover::after {
+            width: 100%;
+        }
+
+        /* Scroll to Top */
+        #scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        #scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scroll-top:hover {
+            background: #D4AF37;
+            color: #000;
+            transform: translateY(-5px);
+        }
+
+        /* Luxury Button Glow */
+        .btn-gold {
+            box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3">
+            <i class="fa-solid fa-camera-retro text-brand-gold text-2xl"></i>
+            <div class="flex flex-col">
+                <span class="luxury-text text-lg leading-none">Megha Films</span>
+                <span class="text-[0.6rem] text-brand-gray tracking-[0.4em] uppercase mt-1">Betul MP</span>
+            </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-10 text-sm tracking-widest font-light">
+            <a href="index.html" class="hover:text-brand-gold transition duration-300">HOME</a>
+            <a href="about.html" class="text-brand-gold transition duration-300">ABOUT</a>
+            <a href="services.html" class="hover:text-brand-gold transition duration-300">SERVICES</a>
+            <a href="portfolio.html" class="hover:text-brand-gold transition duration-300">PORTFOLIO</a>
+            <a href="contact.html" class="hover:text-brand-gold transition duration-300">CONTACT</a>
+            <a href="https://wa.me/918770324064" target="_blank" class="btn-gold">BOOK NOW</a>
+        </div>
+        <button class="text-white text-2xl hover:text-brand-gold transition" id="drawer-toggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </div>
+    </nav>
+
+    <!-- Side Drawer Overlay -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/90 z-[60]"></div>
+
+    <!-- Side Drawer Content -->
+    <div id="side-drawer"
+        class="fixed top-0 right-0 h-full w-[300px] md:w-[450px] bg-brand-dark z-[70] shadow-2xl p-12 flex flex-col justify-center">
+        <button class="absolute top-8 right-8 text-white text-3xl hover:text-brand-gold transition" id="drawer-close">
+            <i class="fa-solid fa-xmark font-light"></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-2xl md:text-3xl font-extralight tracking-[0.2em] uppercase">
+            <a href="index.html" class="side-link hover:text-brand-gold">Home</a>
+            <a href="about.html" class="side-link text-brand-gold">About</a>
+            <a href="services.html" class="side-link hover:text-brand-gold">Services</a>
+            <a href="portfolio.html" class="side-link hover:text-brand-gold">Portfolio</a>
+            <a href="contact.html" class="side-link hover:text-brand-gold">Contact</a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="page-header">
+        <div class="text-center px-4 reveal">
+            <h1 class="text-4xl md:text-6xl font-extralight tracking-widest uppercase mb-4">Our Story</h1>
+            <div class="w-16 h-[1px] bg-brand-gold mx-auto mt-6"></div>
+        </div>
+    </header>
+
+    <!-- Narrative Section -->
+    <section class="py-24 bg-brand-black px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <span class="text-brand-gold luxury-text text-sm mb-6 block">KNOW THE ARTISTS</span>
+            <h2 class="text-3xl md:text-4xl font-light mb-10 leading-relaxed">We don't just take photographs, we create
+                timeless pieces of art that tell your unique love story.</h2>
+            <div class="vertical-divider"></div>
+            <p class="text-brand-gray font-light leading-relaxed text-lg mt-10">
+                Founded in Betul, Madhya Pradesh, Megha Films Pvt Ltd has grown to become the premier choice for luxury
+                wedding documentation. Our journey started with a simple passion: to freeze the most beautiful moments
+                of human connection so they can be relived forever.
+            </p>
+            <p class="text-brand-gray font-light leading-relaxed text-lg mt-6">
+                From intimate candid glances to grand cinematic drone sweeps, our comprehensive in-house team handles
+                every aspect of your wedding media. We blend traditional values with modern aesthetics to ensure your
+                memories are both authentic and breathtaking.
+            </p>
+        </div>
+    </section>
+
+    <!-- Image Break -->
+    <section
+        class="w-full h-[50vh] bg-[url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000')] bg-cover bg-center bg-fixed">
+    </section>
+
+    <!-- Passion & Expertise -->
+    <section class="py-24 bg-brand-dark px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="reveal">
+                <span class="text-brand-gold luxury-text text-sm block mb-4">OUR EXPERTISE</span>
+                <h3 class="text-3xl md:text-4xl font-light mb-8">Cinematic Approach to Indian Weddings</h3>
+                <p class="text-brand-gray font-light mb-6">Indian weddings are a vibrant explosion of color, emotion,
+                    and ritual. Our cinematic approach ensures that the grandeur of your day is captured with the
+                    quality of a feature film.</p>
+                <ul class="space-y-4 font-light text-brand-gray">
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-gold"></i> Professional
+                        Color Grading</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-gold"></i> Aerial
+                        Storytelling (Drones)</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-gold"></i> Unobtrusive
+                        Candid Shots</li>
+                    <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-gold"></i> Premium
+                        Designer Albums</li>
+                </ul>
+            </div>
+            <div class="reveal">
+                <img src="https://images.unsplash.com/photo-1621012430307-b4774b78d3cb?auto=format&fit=crop&w=1200"
+                    alt="Expertise" class="w-full h-auto shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-brand-border">
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#050505] pt-24 pb-12 border-t thin-border text-center reveal">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="luxury-text text-3xl mb-8">Let's Talk About Your Big Day</h2>
+            <div
+                class="flex flex-col md:flex-row justify-center gap-8 md:gap-16 mb-16 font-light uppercase tracking-widest text-sm">
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-location-dot text-brand-gold text-2xl mb-4"></i>
+                    <p>Betul, Madhya Pradesh</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-phone text-brand-gold text-2xl mb-4"></i>
+                    <a href="tel:8770324064" class="hover:text-brand-gold transition">+91 87703 24064</a>
+                </div>
+            </div>
+            <div
+                class="border-t thin-border pt-8 mt-12 flex flex-col md:flex-row items-center justify-between text-brand-gray text-xs tracking-widest">
+                <p id="copyright" onclick="handleSecretClick()" class="cursor-default">&copy; 2026 MEGHA FILMS PVT LTD.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div id="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let clickCount = 0;
+        function handleSecretClick() {
+            clickCount++;
+            if (clickCount >= 5) {
+                window.location.href = 'admin.html';
+            }
+            setTimeout(() => clickCount = 0, 2000);
+        }
+
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        function toggleDrawer() {
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        drawerToggle.addEventListener('click', toggleDrawer);
+        drawerClose.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const scrollTop = document.getElementById('scroll-top');
+            if (window.scrollY > 50) { nav.classList.add('bg-black', 'shadow-lg'); nav.classList.remove('bg-black/80'); }
+            else { nav.classList.remove('bg-black', 'shadow-lg'); nav.classList.add('bg-black/80'); }
+            if (window.scrollY > 300) scrollTop.classList.add('active');
+            else scrollTop.classList.remove('active');
+        });
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 150) reveals[i].classList.add("active");
+            }
+        }
+        window.addEventListener("scroll", reveal); reveal();
+    </script>
+</body>
+
+</html>

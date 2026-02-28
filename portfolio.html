@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Gallery | Megha Films Pvt Ltd</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { black: '#000000', dark: '#0a0a0a', light: '#ffffff', gold: '#D4AF37', gray: '#8a8a8a', border: '#333333' } }, fontFamily: { sans: ['Montserrat', 'sans-serif'], }, letterSpacing: { widest: '.25em', luxury: '.3em' } }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .luxury-text {
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .thin-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-gold {
+            border: 1px solid #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #D4AF37;
+            padding: 12px 30px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+        }
+
+        .btn-gold:hover {
+            background: #D4AF37;
+            color: #000;
+        }
+
+        .page-header {
+            height: 40vh;
+            background: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+        }
+
+        /* Masonry Grid CSS for Portfolio */
+        .masonry-grid {
+            column-count: 1;
+            column-gap: 1rem;
+        }
+
+        @media (min-width: 640px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.8s ease;
+        }
+
+        .masonry-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .masonry-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .masonry-item:hover .masonry-overlay {
+            opacity: 1;
+        }
+
+        /* Lightbox & Video Modal */
+        #lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        #lightbox.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 80vh;
+            position: relative;
+        }
+
+        #lightbox-img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            display: none;
+        }
+
+        #lightbox-video {
+            width: 80vw;
+            height: 45vw;
+            max-width: 1000px;
+            max-height: 562px;
+            display: none;
+        }
+
+        #lightbox-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            font-size: 40px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Side Drawer */
+        #side-drawer {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        #side-drawer.active {
+            transform: translateX(0);
+        }
+
+        #drawer-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-link {
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .side-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: #D4AF37;
+            transition: width 0.3s ease;
+        }
+
+        .side-link:hover::after {
+            width: 100%;
+        }
+
+        /* Scroll to Top */
+        #scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        #scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scroll-top:hover {
+            background: #D4AF37;
+            color: #000;
+            transform: translateY(-5px);
+        }
+
+        /* Luxury Button Glow */
+        .btn-gold {
+            box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3">
+            <i class="fa-solid fa-camera-retro text-brand-gold text-2xl"></i>
+            <div class="flex flex-col">
+                <span class="luxury-text text-lg leading-none">Megha Films</span>
+            </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-10 text-sm tracking-widest font-light">
+            <a href="index.html" class="hover:text-brand-gold transition duration-300">HOME</a>
+            <a href="about.html" class="hover:text-brand-gold transition duration-300">ABOUT</a>
+            <a href="services.html" class="hover:text-brand-gold transition duration-300">SERVICES</a>
+            <a href="portfolio.html" class="text-brand-gold transition duration-300">PORTFOLIO</a>
+            <a href="contact.html" class="hover:text-brand-gold transition duration-300">CONTACT</a>
+            <a href="https://wa.me/918770324064" class="btn-gold">BOOK NOW</a>
+        </div>
+        <button class="text-white text-2xl hover:text-brand-gold transition" id="drawer-toggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </div>
+    </nav>
+
+    <!-- Side Drawer Overlay -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/90 z-[60]"></div>
+
+    <!-- Side Drawer Content -->
+    <div id="side-drawer"
+        class="fixed top-0 right-0 h-full w-[300px] md:w-[450px] bg-brand-dark z-[70] shadow-2xl p-12 flex flex-col justify-center">
+        <button class="absolute top-8 right-8 text-white text-3xl hover:text-brand-gold transition" id="drawer-close">
+            <i class="fa-solid fa-xmark font-light"></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-2xl md:text-3xl font-extralight tracking-[0.2em] uppercase">
+            <a href="index.html" class="side-link hover:text-brand-gold">Home</a>
+            <a href="about.html" class="side-link hover:text-brand-gold">About</a>
+            <a href="services.html" class="side-link hover:text-brand-gold">Services</a>
+            <a href="portfolio.html" class="side-link text-brand-gold">Portfolio</a>
+            <a href="contact.html" class="side-link hover:text-brand-gold">Contact</a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="page-header border-b thin-border">
+        <div class="text-center px-4 reveal">
+            <h1 class="text-4xl md:text-5xl font-extralight tracking-widest uppercase mb-4">Gallery</h1>
+            <p class="text-brand-gray font-light tracking-[0.2em] uppercase text-xs">Our Best Work</p>
+        </div>
+    </header>
+
+    <!-- Portfolio Grid -->
+    <section class="py-16 bg-brand-black px-4 md:px-8 max-w-[1600px] mx-auto">
+
+        <!-- Filter could go here later -->
+
+        <div class="masonry-grid" id="gallery-container">
+            <!-- Items injected by JS -->
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox(event)">
+        <div class="modal-content">
+            <span id="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+            <img id="lightbox-img" src="" alt="Gallery Image">
+            <iframe id="lightbox-video" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#050505] pt-12 pb-12 border-t thin-border text-center reveal">
+        <div class="text-brand-gray text-xs tracking-widest">
+            <p>&copy; 2026 MEGHA FILMS PVT LTD.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div id="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            projectId: "megha-films-betul",
+            authDomain: "megha-films-betul.firebaseapp.com",
+        };
+        try { if (typeof __firebase_config !== 'undefined') Object.assign(firebaseConfig, JSON.parse(__firebase_config)); } catch (e) { }
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'megha-films-betul';
+
+        const container = document.getElementById('gallery-container');
+        const defaultImages = [
+            { type: 'direct', thumbnail: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800", url: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874", category: 'Cinematic' }, // Silhouette
+            { type: 'direct', thumbnail: "https://images.unsplash.com/photo-1621012430307-b4774b78d3cb?auto=format&fit=crop&w=800", url: "https://images.unsplash.com/photo-1621012430307-b4774b78d3cb", category: 'Traditional' }, // Mirror/Ritual
+            { type: 'direct', thumbnail: "https://images.unsplash.com/photo-1595964270729-3877dc65f4de?auto=format&fit=crop&w=800", url: "https://images.unsplash.com/photo-1595964270729-3877dc65f4de", category: 'Traditional' }, // Bride View
+            { type: 'direct', thumbnail: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800", url: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc", category: 'Candid' } // Couple/Emotional
+        ];
+
+        function renderGallery(items) {
+            container.innerHTML = '';
+            items.forEach((item, i) => {
+                const html = `
+                    <div class="masonry-item reveal" onclick='openLightbox(${JSON.stringify(item)})'>
+                        <img src="${item.thumbnail}" alt="Portfolio ${i}">
+                        <div class="masonry-overlay">
+                            ${item.type === 'youtube' ? '<i class="fa-solid fa-play text-brand-gold text-4xl"></i>' : '<i class="fa-solid fa-expand text-brand-gold text-3xl"></i>'}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            setTimeout(() => document.querySelectorAll(".reveal").forEach(el => el.classList.add("active")), 100);
+        }
+
+        db.collection('artifacts').doc(appId).collection('public').doc('data').collection('gallery')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(snapshot => {
+                const items = [];
+                snapshot.forEach(doc => items.push(doc.data()));
+                renderGallery(items.length > 0 ? items : defaultImages);
+            });
+
+        const lightbox = document.getElementById('lightbox');
+        const lImg = document.getElementById('lightbox-img');
+        const lVid = document.getElementById('lightbox-video');
+
+        function openLightbox(item) {
+            lImg.style.display = 'none';
+            lVid.style.display = 'none';
+            lVid.src = '';
+
+            if (item.type === 'youtube') {
+                const vid = item.mediaId || item.url.split('v=')[1]?.split('&')[0];
+                lVid.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
+                lVid.style.display = 'block';
+            } else if (item.type === 'instagram') {
+                lVid.src = `${item.url}embed`;
+                lVid.style.display = 'block';
+            } else {
+                lImg.src = item.url;
+                lImg.style.display = 'block';
+            }
+            lightbox.classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            if (e.target === lightbox || e.target.id === 'lightbox-close') {
+                lightbox.classList.remove('active');
+                lVid.src = '';
+            }
+        }
+
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        function toggleDrawer() {
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        drawerToggle.addEventListener('click', toggleDrawer);
+        drawerClose.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const scrollTop = document.getElementById('scroll-top');
+            if (window.scrollY > 50) { nav.classList.add('bg-black', 'shadow-lg'); nav.classList.remove('bg-black/80'); }
+            else { nav.classList.remove('bg-black', 'shadow-lg'); nav.classList.add('bg-black/80'); }
+            if (window.scrollY > 300) scrollTop.classList.add('active');
+            else scrollTop.classList.remove('active');
+        });
+        window.addEventListener("scroll", () => {
+            document.querySelectorAll(".reveal").forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 50) el.classList.add("active");
+            });
+        });
+    </script>
+</body>
+
+</html>

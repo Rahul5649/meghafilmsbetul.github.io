@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Megha Films | Premium Wedding Photography in Betul</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { black: '#000000', dark: '#0a0a0a', light: '#ffffff', gold: '#D4AF37', gray: '#8a8a8a', border: '#333333' } }, fontFamily: { sans: ['Montserrat', 'sans-serif'], }, letterSpacing: { widest: '.25em', luxury: '.3em' } }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .luxury-text {
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .thin-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-luxury {
+            border: 1px solid #fff;
+            background: transparent;
+            color: #fff;
+            padding: 12px 30px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-luxury:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-gold {
+            border: 1px solid #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #D4AF37;
+            padding: 12px 30px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+        }
+
+        .btn-gold:hover {
+            background: #D4AF37;
+            color: #000;
+        }
+
+        .hero-section {
+            height: 100vh;
+            position: relative;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            z-index: 1;
+        }
+
+        .hero-bg.active {
+            opacity: 0.7;
+            /* Adjust brightness */
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+        }
+
+        .img-container {
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .img-container img {
+            transition: transform 0.8s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .service-card {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .service-card:hover {
+            border-color: #D4AF37;
+            transform: translateY(-10px);
+        }
+
+        .vertical-divider {
+            width: 1px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 20px auto;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Side Drawer */
+        #side-drawer {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        #side-drawer.active {
+            transform: translateX(0);
+        }
+
+        #drawer-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-link {
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .side-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: #D4AF37;
+            transition: width 0.3s ease;
+        }
+
+        .side-link:hover::after {
+            width: 100%;
+        }
+
+        /* Scroll to Top */
+        #scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        #scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scroll-top:hover {
+            background: #D4AF37;
+            color: #000;
+            transform: translateY(-5px);
+        }
+
+        /* Luxury Button Glow */
+        .btn-gold {
+            box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+        }
+
+        .btn-gold:hover {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b thin-border transition-all duration-300"
+        id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3">
+                <i class="fa-solid fa-camera-retro text-brand-gold text-2xl"></i>
+                <div class="flex flex-col">
+                    <span class="luxury-text text-lg leading-none">Megha Films</span>
+                    <span class="text-[0.6rem] text-brand-gray tracking-[0.4em] uppercase mt-1">Betul MP</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center space-x-10 text-sm tracking-widest font-light">
+                <a href="index.html" class="text-brand-gold transition duration-300">HOME</a>
+                <a href="about.html" class="hover:text-brand-gold transition duration-300">ABOUT</a>
+                <a href="services.html" class="hover:text-brand-gold transition duration-300">SERVICES</a>
+                <a href="portfolio.html" class="hover:text-brand-gold transition duration-300">PORTFOLIO</a>
+                <a href="contact.html" class="hover:text-brand-gold transition duration-300">CONTACT</a>
+                <a href="https://wa.me/918770324064" target="_blank" class="btn-gold">BOOK NOW</a>
+            </div>
+
+            <!-- Hamburger (All screen sizes for studio parity) -->
+            <button class="text-white text-2xl hover:text-brand-gold transition" id="drawer-toggle">
+                <i class="fa-solid fa-bars-staggered"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Side Drawer Overlay -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/90 z-[60]"></div>
+
+    <!-- Side Drawer Content -->
+    <div id="side-drawer"
+        class="fixed top-0 right-0 h-full w-[300px] md:w-[450px] bg-brand-dark z-[70] shadow-2xl p-12 flex flex-col justify-center">
+        <button class="absolute top-8 right-8 text-white text-3xl hover:text-brand-gold transition" id="drawer-close">
+            <i class="fa-solid fa-xmark font-light"></i>
+        </button>
+
+        <div class="flex flex-col space-y-8 text-2xl md:text-3xl font-extralight tracking-[0.2em] uppercase">
+            <a href="index.html" class="side-link text-brand-gold">Home</a>
+            <a href="about.html" class="side-link hover:text-brand-gold">About</a>
+            <a href="services.html" class="side-link hover:text-brand-gold">Services</a>
+            <a href="portfolio.html" class="side-link hover:text-brand-gold">Portfolio</a>
+            <a href="contact.html" class="side-link hover:text-brand-gold">Contact</a>
+        </div>
+
+        <div class="mt-20 border-t thin-border pt-10">
+            <p class="text-brand-gray text-[0.6rem] tracking-widest uppercase mb-4">Get in touch</p>
+            <a href="tel:8770324064" class="text-lg font-light block mb-2 hover:text-brand-gold">+91 87703 24064</a>
+            <div class="flex gap-6 mt-6 text-xl text-brand-gray">
+                <a href="#" class="hover:text-brand-gold transition"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="hover:text-brand-gold transition"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-brand-gold transition"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div id="hero-slider">
+            <!-- Layers will be injected here -->
+        </div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content text-center px-4 reveal">
+            <h2 class="text-brand-gold luxury-text text-sm md:text-base mb-6">Capturing Real Emotions</h2>
+            <h1 class="text-4xl md:text-7xl font-extralight tracking-widest uppercase mb-4">Megha <span
+                    class="font-normal opacity-50">|</span> Films</h1>
+            <div class="vertical-divider"></div>
+            <p class="text-brand-gray font-light tracking-[0.2em] uppercase text-xs md:text-sm mb-10 max-w-xl mx-auto">
+                Cinematic Wedding Films • Traditional Photography • Drone Coverage • Live Streaming
+            </p>
+            <a href="portfolio.html" class="btn-luxury">
+                View Portfolio <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- About Snippet -->
+    <section class="py-24 bg-brand-black px-6">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <span class="text-brand-gold luxury-text text-sm block mb-4">OUR PASSION</span>
+            <h2 class="text-3xl md:text-4xl font-light leading-relaxed mb-8">We capture timeless moments <br> for modern
+                couples.</h2>
+            <p class="text-brand-gray font-light leading-relaxed text-lg mb-10">
+                Megha Films Pvt Ltd is a premium wedding photography and cinematography studio based in Betul, Madhya
+                Pradesh.
+                We combine technical expertise with true emotion to craft stunning visual narratives of your big day.
+            </p>
+            <a href="about.html"
+                class="text-white text-sm tracking-widest uppercase border-b border-brand-gold pb-1 hover:text-brand-gold transition">Read
+                Our Story</a>
+        </div>
+    </section>
+
+    <!-- Services Grid Preview -->
+    <section class="py-24 bg-brand-dark px-6 border-y thin-border">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 reveal">
+                <div>
+                    <span class="text-brand-gold luxury-text text-xs">WHAT WE DO</span>
+                    <h2 class="text-3xl md:text-5xl font-extralight tracking-widest mt-4">Our Services</h2>
+                </div>
+                <a href="services.html" class="btn-luxury mt-8 md:mt-0">View Pricing & Packages</a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+                <div class="service-card group cursor-pointer" onclick="window.location.href='services.html'">
+                    <i
+                        class="fa-solid fa-camera text-4xl text-brand-gray group-hover:text-brand-gold transition mb-6"></i>
+                    <h3 class="luxury-text text-sm mb-4 text-white">Traditional Wedding</h3>
+                    <p class="text-brand-gray text-xs font-light tracking-wide leading-relaxed">Full 3-day coverage
+                        including photography, videography, and premium designer albums.</p>
+                </div>
+                <div class="service-card group cursor-pointer" onclick="window.location.href='services.html'">
+                    <i
+                        class="fa-solid fa-video text-4xl text-brand-gray group-hover:text-brand-gold transition mb-6"></i>
+                    <h3 class="luxury-text text-sm mb-4 text-white">Cinematic Films</h3>
+                    <p class="text-brand-gray text-xs font-light tracking-wide leading-relaxed">Modern, stylistic
+                        storytelling with slow-motion highlights and professional color grading.</p>
+                </div>
+                <div class="service-card group cursor-pointer" onclick="window.location.href='services.html'">
+                    <i
+                        class="fa-brands fa-fly text-4xl text-brand-gray group-hover:text-brand-gold transition mb-6"></i>
+                    <h3 class="luxury-text text-sm mb-4 text-white">Drone Coverage</h3>
+                    <p class="text-brand-gray text-xs font-light tracking-wide leading-relaxed">Stunning aerial
+                        perspectives of your venue, Baraat entry, and Varmala.</p>
+                </div>
+                <div class="service-card group cursor-pointer" onclick="window.location.href='services.html'">
+                    <i class="fa-solid fa-tv text-4xl text-brand-gray group-hover:text-brand-gold transition mb-6"></i>
+                    <h3 class="luxury-text text-sm mb-4 text-white">Live Streaming</h3>
+                    <p class="text-brand-gray text-xs font-light tracking-wide leading-relaxed">LED Wall setups and
+                        single-camera live streaming for your distant relatives.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Portfolio -->
+    <section class="py-24 bg-brand-black px-4 lg:px-0">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-3xl md:text-5xl font-extralight tracking-widest mt-4">Featured Work</h2>
+            <div class="w-16 h-[1px] bg-brand-gold mx-auto mt-8"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 w-full" id="featured-grid">
+            <!-- Items injected by JS -->
+        </div>
+
+        <div class="text-center mt-12 reveal">
+            <a href="portfolio.html" class="btn-luxury border-brand-border hover:border-white">Explore Full
+                Portfolio</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#050505] pt-24 pb-12 border-t thin-border text-center reveal">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="luxury-text text-3xl mb-8">Let's Talk About Your Big Day</h2>
+            <div
+                class="flex flex-col md:flex-row justify-center gap-8 md:gap-16 mb-16 font-light uppercase tracking-widest text-sm">
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-location-dot text-brand-gold text-2xl mb-4"></i>
+                    <p>Betul, Madhya Pradesh</p>
+                </div>
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-phone text-brand-gold text-2xl mb-4"></i>
+                    <a href="tel:8770324064" class="hover:text-brand-gold transition">+91 87703 24064</a>
+                </div>
+            </div>
+            <a href="contact.html"
+                class="btn-gold px-10 py-4 text-sm font-bold shadow-[0_0_20px_rgba(212,175,55,0.2)] mb-20 inline-block">Contact
+                Us</a>
+
+            <div
+                class="border-t thin-border pt-8 flex flex-col items-center justify-between text-brand-gray text-xs tracking-widest">
+                <p id="copyright" onclick="handleSecretClick()" class="cursor-default">&copy; 2026 MEGHA FILMS PVT LTD.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div id="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            projectId: "megha-films-betul",
+            authDomain: "megha-films-betul.firebaseapp.com",
+        };
+        try { if (typeof __firebase_config !== 'undefined') Object.assign(firebaseConfig, JSON.parse(__firebase_config)); } catch (e) { }
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'megha-films-betul';
+
+        const featuredGrid = document.getElementById('featured-grid');
+        const defaultFeatured = [
+            "https://images.unsplash.com/photo-1621012430307-b4774b78d3cb?auto=format&fit=crop&w=800",
+            "https://images.unsplash.com/photo-1595964270729-3877dc65f4de?auto=format&fit=crop&w=800",
+            "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800"
+        ];
+
+        function renderFeatured(items) {
+            featuredGrid.innerHTML = '';
+            const displayItems = items.length >= 3 ? items.slice(0, 3) : defaultFeatured.map(url => ({ thumbnail: url }));
+
+            displayItems.forEach((item, i) => {
+                const html = `
+                    <div class="img-container h-[400px] md:h-[500px] reveal" onclick="window.location.href='portfolio.html'">
+                        <img src="${item.thumbnail || item}" alt="Featured Gallery">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-500">
+                            <span class="luxury-text text-sm text-brand-gold border border-brand-gold py-2 px-6">View Gallery</span>
+                        </div>
+                    </div>
+                `;
+                featuredGrid.innerHTML += html;
+            });
+            setTimeout(() => document.querySelectorAll(".reveal").forEach(el => el.classList.add("active")), 100);
+        }
+
+        db.collection('artifacts').doc(appId).collection('public').doc('data').collection('gallery')
+            .orderBy('createdAt', 'desc')
+            .limit(3)
+            .onSnapshot(snapshot => {
+                const items = [];
+                snapshot.forEach(doc => items.push(doc.data()));
+                renderFeatured(items);
+            });
+
+        let clickCount = 0;
+        function handleSecretClick() {
+            clickCount++;
+            if (clickCount >= 5) {
+                window.location.href = 'admin.html';
+            }
+            setTimeout(() => clickCount = 0, 2000); // Reset after 2s
+        }
+
+        // Drawer Logic
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        function toggleDrawer() {
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        drawerToggle.addEventListener('click', toggleDrawer);
+        drawerClose.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+
+        // Hero Slider Logic
+        const heroImages = [
+            'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2000', // Silhouette/Warm
+            'https://images.unsplash.com/photo-1595964270729-3877dc65f4de?auto=format&fit=crop&w=2000', // Traditional Bride
+            'https://images.unsplash.com/photo-1610173827002-62c051fde501?auto=format&fit=crop&w=2000' // Pre-wedding bridge
+        ];
+        const heroContainer = document.getElementById('hero-slider');
+        let currentHeroIndex = 0;
+
+        function initHero() {
+            heroImages.forEach((img, i) => {
+                const div = document.createElement('div');
+                div.className = `hero-bg ${i === 0 ? 'active' : ''}`;
+                div.style.backgroundImage = `url('${img}')`;
+                heroContainer.appendChild(div);
+            });
+
+            setInterval(() => {
+                const backgrounds = document.querySelectorAll('.hero-bg');
+                backgrounds[currentHeroIndex].classList.remove('active');
+                currentHeroIndex = (currentHeroIndex + 1) % heroImages.length;
+                backgrounds[currentHeroIndex].classList.add('active');
+            }, 5000);
+        }
+        initHero();
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const scrollTop = document.getElementById('scroll-top');
+
+            if (window.scrollY > 50) {
+                nav.classList.add('bg-black', 'shadow-lg');
+                nav.classList.remove('bg-black/80');
+            } else {
+                nav.classList.remove('bg-black', 'shadow-lg');
+                nav.classList.add('bg-black/80');
+            }
+
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('active');
+            } else {
+                scrollTop.classList.remove('active');
+            }
+        });
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 150) reveals[i].classList.add("active");
+            }
+        }
+        window.addEventListener("scroll", reveal); reveal();
+    </script>
+</body>
+
+</html>

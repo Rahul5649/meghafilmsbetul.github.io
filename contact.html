@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & FAQ | Megha Films Pvt Ltd</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { brand: { black: '#000000', dark: '#0a0a0a', light: '#ffffff', gold: '#D4AF37', gray: '#8a8a8a', border: '#333333' } }, fontFamily: { sans: ['Montserrat', 'sans-serif'], }, letterSpacing: { widest: '.25em', luxury: '.3em' } }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .luxury-text {
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 200;
+        }
+
+        .thin-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-gold {
+            border: 1px solid #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+            color: #D4AF37;
+            padding: 16px 30px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.4s ease;
+            width: 100%;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .btn-gold:hover {
+            background: #D4AF37;
+            color: #000;
+        }
+
+        .page-header {
+            height: 40vh;
+            background: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 80px;
+        }
+
+        /* Form Styles */
+        input,
+        textarea {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            margin-bottom: 20px;
+            transition: border 0.3s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .faq-question {
+            font-weight: 400;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .faq-item:hover .faq-question {
+            color: #D4AF37;
+        }
+
+        .faq-answer {
+            font-weight: 300;
+            color: #8a8a8a;
+            font-size: 0.9rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, margin-top 0.4s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            margin-top: 15px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(135deg);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Side Drawer */
+        #side-drawer {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        #side-drawer.active {
+            transform: translateX(0);
+        }
+
+        #drawer-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        #drawer-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-link {
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .side-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: #D4AF37;
+            transition: width 0.3s ease;
+        }
+
+        .side-link:hover::after {
+            width: 100%;
+        }
+
+        /* Scroll to Top */
+        #scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #D4AF37;
+            color: #D4AF37;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        #scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scroll-top:hover {
+            background: #D4AF37;
+            color: #000;
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-3">
+            <i class="fa-solid fa-camera-retro text-brand-gold text-2xl"></i>
+            <div class="flex flex-col">
+                <span class="luxury-text text-lg leading-none">Megha Films</span>
+            </div>
+        </a>
+        <div class="hidden md:flex items-center space-x-10 text-sm tracking-widest font-light">
+            <a href="index.html" class="hover:text-brand-gold transition duration-300">HOME</a>
+            <a href="about.html" class="hover:text-brand-gold transition duration-300">ABOUT</a>
+            <a href="services.html" class="hover:text-brand-gold transition duration-300">SERVICES</a>
+            <a href="portfolio.html" class="hover:text-brand-gold transition duration-300">PORTFOLIO</a>
+            <a href="contact.html" class="text-brand-gold transition duration-300">CONTACT</a>
+            <a href="https://wa.me/918770324064" class="btn-gold !w-auto">BOOK NOW</a>
+        </div>
+        <button class="text-white text-2xl hover:text-brand-gold transition" id="drawer-toggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </div>
+    </nav>
+
+    <!-- Side Drawer Overlay -->
+    <div id="drawer-overlay" class="fixed inset-0 bg-black/90 z-[60]"></div>
+
+    <!-- Side Drawer Content -->
+    <div id="side-drawer"
+        class="fixed top-0 right-0 h-full w-[300px] md:w-[450px] bg-brand-dark z-[70] shadow-2xl p-12 flex flex-col justify-center">
+        <button class="absolute top-8 right-8 text-white text-3xl hover:text-brand-gold transition" id="drawer-close">
+            <i class="fa-solid fa-xmark font-light"></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-2xl md:text-3xl font-extralight tracking-[0.2em] uppercase">
+            <a href="index.html" class="side-link hover:text-brand-gold">Home</a>
+            <a href="about.html" class="side-link hover:text-brand-gold">About</a>
+            <a href="services.html" class="side-link hover:text-brand-gold">Services</a>
+            <a href="portfolio.html" class="side-link hover:text-brand-gold">Portfolio</a>
+            <a href="contact.html" class="side-link text-brand-gold">Contact</a>
+        </div>
+    </div>
+
+    <header class="page-header border-b thin-border">
+        <div class="text-center px-4 reveal">
+            <h1 class="text-4xl md:text-5xl font-extralight tracking-widest uppercase mb-4">Contact us</h1>
+            <p class="text-brand-gray font-light tracking-[0.2em] uppercase text-xs">Let's discuss your big day</p>
+        </div>
+    </header>
+
+    <!-- Contact & Form Section -->
+    <section class="py-24 bg-brand-black px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
+            <!-- Info -->
+            <div class="reveal">
+                <h2 class="luxury-text text-3xl mb-10">Get In Touch</h2>
+                <div class="space-y-8 font-light tracking-widest text-sm uppercase">
+                    <div class="flex items-start gap-4">
+                        <i class="fa-solid fa-location-dot text-brand-gold text-xl mt-1"></i>
+                        <div>
+                            <p class="text-brand-gold mb-1">Studio</p>
+                            <p class="text-brand-gray">Betul, Madhya Pradesh</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <i class="fa-solid fa-phone text-brand-gold text-xl mt-1"></i>
+                        <div>
+                            <p class="text-brand-gold mb-1">Call / WhatsApp</p>
+                            <a href="tel:8770324064" class="text-brand-gray hover:text-white transition">+91 87703
+                                24064</a>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <i class="fa-solid fa-envelope text-brand-gold text-xl mt-1"></i>
+                        <div>
+                            <p class="text-brand-gold mb-1">Email</p>
+                            <a href="mailto:meghafilms453@gmail.com"
+                                class="text-brand-gray lowercase tracking-normal hover:text-white transition">meghafilms453@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Social -->
+                <div class="mt-12 flex gap-6 text-xl">
+                    <a href="#"
+                        class="w-12 h-12 rounded-full border thin-border flex items-center justify-center hover:bg-brand-gold hover:border-brand-gold hover:text-black transition"><i
+                            class="fa-brands fa-instagram"></i></a>
+                    <a href="#"
+                        class="w-12 h-12 rounded-full border thin-border flex items-center justify-center hover:bg-brand-gold hover:border-brand-gold hover:text-black transition"><i
+                            class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"
+                        class="w-12 h-12 rounded-full border thin-border flex items-center justify-center hover:bg-brand-gold hover:border-brand-gold hover:text-black transition"><i
+                            class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="bg-brand-dark p-8 md:p-12 border thin-border reveal">
+                <form id="contactForm" onsubmit="submitToWhatsApp(event)">
+                    <p class="text-brand-gray font-light text-sm mb-8">Fill the form below and we will redirect you to
+                        WhatsApp with your details.</p>
+                    <input type="text" id="name" placeholder="YOUR NAME" required>
+                    <input type="tel" id="phone" placeholder="PHONE NUMBER" required>
+                    <input type="text" id="wedding_date" placeholder="WEDDING DATE (DD/MM/YYYY)" required>
+                    <textarea id="message" rows="4"
+                        placeholder="TELL US ABOUT YOUR WEDDING (VENUE, EVENTS, ETC.)"></textarea>
+                    <button type="submit" class="btn-gold">Send Inquiry via WhatsApp</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-24 bg-[#050505] px-6 border-t thin-border">
+        <div class="max-w-4xl mx-auto reveal">
+            <h2 class="text-center luxury-text text-3xl mb-12">Frequent Questions</h2>
+
+            <div class="faq-item" onclick="this.classList.toggle('active')">
+                <div class="faq-question"><span>What is included in the 3 Day Traditional Package?</span> <i
+                        class="fa-solid fa-plus faq-icon"></i></div>
+                <div class="faq-answer">It includes 3 Day Photography, 3 Day Videography, a 40 Sheet Premium Designer
+                    Album, a 3 Hour Edited Film, HD Video Output, and full coverage of Haldi, Mehendi, and the Wedding
+                    for ₹35,000.</div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('active')">
+                <div class="faq-question"><span>Do you travel outside of Betul?</span> <i
+                        class="fa-solid fa-plus faq-icon"></i></div>
+                <div class="faq-answer">Yes, we provide services all over India. Travel and accommodation charges will
+                    be extra depending on the location of the event.</div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('active')">
+                <div class="faq-question"><span>How do we book you for our wedding?</span> <i
+                        class="fa-solid fa-plus faq-icon"></i></div>
+                <div class="faq-answer">You can contact us via WhatsApp, call us at +91 87703 24064, or fill out the
+                    contact form on this page to block your dates. We require an advance payment to confirm the booking.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="this.classList.toggle('active')">
+                <div class="faq-question"><span>Do you provide Live Streaming and LED Walls?</span> <i
+                        class="fa-solid fa-plus faq-icon"></i></div>
+                <div class="faq-answer">Yes! We provide LED Wall setups for ₹10,000 and Single Camera Live Streaming for
+                    ₹5,000 so your distant relatives can watch your wedding live.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black pt-12 pb-12 border-t thin-border text-center reveal">
+        <div class="text-brand-gray text-xs tracking-widest">
+            <p id="copyright" onclick="handleSecretClick()" class="cursor-default">&copy; 2026 MEGHA FILMS PVT LTD. ALL
+                RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <div id="scroll-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <i class="fa-solid fa-chevron-up"></i>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let clickCount = 0;
+        function handleSecretClick() {
+            clickCount++;
+            if (clickCount >= 5) {
+                window.location.href = 'admin.html';
+            }
+            setTimeout(() => clickCount = 0, 2000);
+        }
+
+        const drawerToggle = document.getElementById('drawer-toggle');
+        const drawerClose = document.getElementById('drawer-close');
+        const drawer = document.getElementById('side-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+
+        function toggleDrawer() {
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        drawerToggle.addEventListener('click', toggleDrawer);
+        drawerClose.addEventListener('click', toggleDrawer);
+        overlay.addEventListener('click', toggleDrawer);
+
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const scrollTop = document.getElementById('scroll-top');
+            if (window.scrollY > 50) { nav.classList.add('bg-black', 'shadow-lg'); nav.classList.remove('bg-black/80'); }
+            else { nav.classList.remove('bg-black', 'shadow-lg'); nav.classList.add('bg-black/80'); }
+            if (window.scrollY > 300) scrollTop.classList.add('active');
+            else scrollTop.classList.remove('active');
+        });
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                if (elementTop < windowHeight - 150) reveals[i].classList.add("active");
+            }
+        }
+        window.addEventListener("scroll", reveal); reveal();
+
+        function submitToWhatsApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const date = document.getElementById('wedding_date').value;
+            const msg = document.getElementById('message').value;
+            const text = `*New Wedding Inquiry*\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Date:* ${date}\n*Message:* ${msg}`;
+            window.open(`https://wa.me/918770324064?text=${encodeURIComponent(text)}`, '_blank');
+        }
+    </script>
+</body>
+
+</html>
